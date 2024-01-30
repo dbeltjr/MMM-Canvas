@@ -33,7 +33,7 @@ git clone https://github.com/dbeltjr/MMM-Canvas.git
 ```
 .legend-item {
     margin-right: 10px;
-	margin-left: 10px;
+    margin-left: 10px;
 }
 ```
 ### Preview
