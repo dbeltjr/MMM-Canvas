@@ -46,4 +46,5 @@ MagicMirror²:   [MagicMirror²](https://github.com/MichMich/MagicMirror)
 Based heavily on the MMM-Lice (Live International Currency Exchange) module by mkyle1
 MMM-LICE:    [MMM-LICE](https://github.com/mykle1/MMM-LICE)
 CanvasAPI:  [CanvasAPI](https://canvas.instructure.com/doc/api/index.html)
+
 Original MMM-Canvas  [chase-cromwell/MMM-Canvas](https://github.com/chase-cromwell/MMM-Canvas)
