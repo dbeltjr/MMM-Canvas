@@ -1,7 +1,7 @@
 /* Magic Mirror
  * Module: MMM-CANVAS
  *
- * By Chase Cromwell
+ * By Dale Belt
  *
  */
 Module.register("MMM-Canvas", {
@@ -33,78 +33,110 @@ Module.register("MMM-Canvas", {
     },
 
 
-    getDom: function() {
-        var wrapper = document.createElement("div");
-        wrapper.className = "wrapper";
-        //wrapper.style.maxWidth = this.config.maxWidth;
+getDom: function() {
+    var wrapper = document.createElement("div");
+    wrapper.className = "wrapper";
 
-        if (!this.loaded) {
-            wrapper.innerHTML = this.translate("Loading Canvas . . .");
-            wrapper.classList.add("bright", "light", "small");
-            return wrapper;
-        }
-
-        var CANVAS = this.CANVAS;
-
-        var top = document.createElement("div");
-        top.classList.add("list-row");
-
-        // create table
-         var Table = document.createElement("table");
-
-        // create row and column for Currency
-        var Row = document.createElement("tr");
-        var Column = document.createElement("th");
-        Column.classList.add("align-left", "small", "bright", "Currency");
-        Column.innerHTML = "Upcoming Due Dates";
-        Row.appendChild(Column);
-
-        // create row and column for Rate
-        var Rate = document.createElement("th");
-        Rate.classList.add("align-left", "small", "bright", "Rate");
-        Rate.innerHTML = "";
-        Row.appendChild(Rate);
-
-
-        Table.appendChild(Row);
-    CANVAS[1].sort((a,b) => new moment(a[1]) - new moment(b[1]));
-      var assignToDisplay = this.config.assignToDisplay + 1
-		for (var i in CANVAS[1].slice(0, assignToDisplay)) {
-
-	//// Learned this on jsfiddle. HOORAY!
-	//// This dynamically creates the div/tags for each element of CANVAS.quotes
-        var Row = document.createElement("tr");
-        var newElement = document.createElement("td");
-        var newElement1 = document.createElement("td");
-        newElement.classList.add("align-left", "small");
-        newElement1.classList.add("align-right", "small");
-        if (CANVAS[1][i][0] != "") {
-          newElement.innerHTML = CANVAS[1][i][0].slice(0, this.config.assignMaxLen);
-          var m = moment(CANVAS[1][i][1]);
-          //newElement1.innerHTML = m.format("M/D h:mm A");
-          //newElement1.innerHTML = m.format("M/D h:mm A");
-          newElement1.innerHTML = CANVAS[1][i][2];
-          newElement1.style.color = this.config.colors[CANVAS[1][i][2]];
-          newElement.style.color = this.config.colors[CANVAS[1][i][2]];
-        }
-
-
-		Row.appendChild(newElement);
-    Row.appendChild(newElement1);
-    Table.appendChild(Row);
-
-	} // <-- closes key/pair loop
-        wrapper.appendChild(Table);
-        var timestamp = document.createElement("div");
-        timestamp.classList.add("small", "bright", "timestamp");
-        timestamp.innerHTML = "Last Checked " + moment().format('h:mm a') + " today";
-        timestamp.style.fontSize = "x-small";
-        wrapper.appendChild(timestamp);
+    if (!this.loaded) {
+        wrapper.innerHTML = this.translate("Loading Canvas . . .");
+        wrapper.classList.add("bright", "light", "small");
         return wrapper;
-}, // closes getDom
+    }
 
+    var CANVAS = this.CANVAS;
+	
+    // Create legend for class-color association
+	var legend = document.createElement("div");
+	legend.classList.add("legend");
 
+	for (var i = 0; i < this.config.courses.length; i++) {
+		var legendItem = document.createElement("span");
+		legendItem.classList.add("legend-item");
+		legendItem.style.color = this.config.colors[i];
+		legendItem.innerHTML = this.config.courseDesignators[i];
+		legend.appendChild(legendItem);
+	}
+	// Legend title
+	var legendContainer = document.createElement("div");
+	legendContainer.classList.add("legend-container");
 
+	// Add a title
+	var title = document.createElement("div");
+	title.classList.add("title", "align-left", "small", "bright");
+	title.innerHTML = "Classes:";
+
+	// Add the title and legend to the container
+	legendContainer.appendChild(title);
+	legendContainer.appendChild(legend);
+
+	// Apply CSS to make title and legend inline, center them, and add space
+	title.style.display = "inline-block";
+	title.style.marginRight = "20px"; // Adjust the space to your preference
+	legend.style.display = "inline-block";
+	legend.style.verticalAlign = "top"; // Vertically center the legend
+
+	wrapper.appendChild(legendContainer);
+
+    // Create table
+    var table = document.createElement("table");
+
+    // Create header row
+    var headerRow = document.createElement("tr");
+    var headerColumn = document.createElement("th");
+    headerColumn.classList.add("align-left", "small", "bright", "Currency");
+    headerColumn.innerHTML = "Upcoming Assignments";
+    headerRow.appendChild(headerColumn);
+
+    var headerDueDate = document.createElement("th");
+    headerDueDate.classList.add("align-left", "small", "bright", "DueDate");
+    headerDueDate.innerHTML = "Due";
+    headerRow.appendChild(headerDueDate);
+
+    table.appendChild(headerRow);
+
+    // Sort CANVAS data by due date
+    CANVAS[1].sort((a, b) => new moment(a[1]) - new moment(b[1]));
+
+    var assignToDisplay = this.config.assignToDisplay +1;
+    for (var i = 0; i < Math.min(CANVAS[1].length, assignToDisplay); i++) {
+        var row = document.createElement("tr");
+        var classColumn = document.createElement("td");
+        var dueDateColumn = document.createElement("td");
+
+        classColumn.classList.add("align-left", "small");
+        dueDateColumn.classList.add("align-left", "small");
+
+        if (CANVAS[1][i][0] != "") {
+
+		// Display class and color it based on the legend
+		classColumn.innerHTML = CANVAS[1][i][0].slice(0, this.config.assignMaxLen);
+		var courseValueString = String(CANVAS[1][i][2]);
+
+		// Use the course value directly as an index for colors
+		var courseIndex = parseInt(courseValueString, 10); // Assuming course values are numeric
+		classColumn.style.color = this.config.colors[courseIndex] || "";
+
+		// Display due date
+		var m = moment(CANVAS[1][i][1]);
+		dueDateColumn.innerHTML = m.format("M/D");
+        }
+
+        row.appendChild(classColumn);
+        row.appendChild(dueDateColumn);
+        table.appendChild(row);
+    }
+
+    wrapper.appendChild(table);
+
+    // Display timestamp
+    var timestamp = document.createElement("div");
+    timestamp.classList.add("small", "bright", "timestamp");
+    timestamp.innerHTML = "Last Checked " + moment().format('h:mm a') + " today";
+    timestamp.style.fontSize = "x-small";
+    wrapper.appendChild(timestamp);
+
+    return wrapper;
+},
 
     /////  Add this function to the modules you want to control with voice //////
 

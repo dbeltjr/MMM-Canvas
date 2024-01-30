@@ -27,3 +27,11 @@
 .MMM-LICE .Rate {
   color: #33FFFD;               /* Exchange color. Default is white. */
 }
+.legend {
+    display: flex;
+    justify-content: center; /* Align the items horizontally in the center */
+}
+.legend-item {
+    display: inline-block;
+    margin-right: 10px; /* Adjust as needed to provide spacing between items */
+}

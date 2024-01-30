@@ -1,7 +1,7 @@
 /* Magic Mirror
  * Module: MMM-CANVAS
  *
- * By Chase Cromwell
+ * By Dale Belt
  *
  */
 const NodeHelper = require('node_helper');
@@ -38,24 +38,26 @@ module.exports = NodeHelper.create({
             }
         }, 400);
 
-        function runCourses(item, index) {
-            var url = "https://"+ urlbase +"/api/v1/courses/" + courses[index] + "/assignments?access_token=" + key + "&per_page=30&bucket=upcoming&order_by=due_at";
-            request({
-                url: url,
-                method: 'GET'
-            }, (error, response, body) => {
-                if (!error && response.statusCode == 200) {
-                    var result = JSON.parse(body);
-                    for (var j in result) {
-                        smallpayload.push([result[j].name, result[j].due_at, index]);
-                    }
-                } else {
-                  smallpayload.push(["ERROR", JSON.parse(error), ""]);
-                }
-                finalpayload.push(smallpayload);
-                count++;
-            });
-        }
+		function runCourses(item, index) {
+			var url = "https://"+ urlbase +"/api/v1/courses/" + courses[index] + "/assignments?access_token=" + key + "&per_page=30&order_by=due_at";
+			request({
+				url: url,
+				method: 'GET'
+			}, (error, response, body) => {
+				if (!error && response.statusCode == 200) {
+					var result = JSON.parse(body);
+					for (var j in result) {
+						smallpayload.push([result[j].name, result[j].due_at, index]);
+					}
+				} else {
+				  console.error("Error fetching assignments:", error);
+				  smallpayload.push(["ERROR", JSON.parse(error), ""]);
+				}
+				finalpayload.push(smallpayload);
+				count++;
+			});
+		}
+
     },
 
     socketNotificationReceived: function(notification, payload) {
