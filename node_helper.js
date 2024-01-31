@@ -39,7 +39,7 @@ module.exports = NodeHelper.create({
         }, 400);
 
 		function runCourses(item, index) {
-			var url = "https://"+ urlbase +"/api/v1/courses/" + courses[index] + "/assignments?access_token=" + key + "&per_page=30&order_by=due_at";
+			var url = "https://"+ urlbase +"/api/v1/courses/" + courses[index] + "/assignments?access_token=" + key + "&per_page=30&order_by=due_at&bucket=unsubmitted";
 			request({
 				url: url,
 				method: 'GET'
