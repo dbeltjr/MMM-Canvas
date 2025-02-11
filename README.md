@@ -20,6 +20,7 @@ git clone https://github.com/dbeltjr/MMM-Canvas.git
     urlbase: "elearning.university.edu",
     assignMaxLen: 35,
     assignToDisplay: 3,
+    overdueDays: 7,
   }
 },
 ```
@@ -36,6 +37,7 @@ git clone https://github.com/dbeltjr/MMM-Canvas.git
     margin-left: 10px;
 }
 ```
+10. (Optional) By default assignments beyond 7 days overdue will drop off the list. This can be changed to any number of days.
 ### Preview
 ![Screenshot](screenshot.png)
 
