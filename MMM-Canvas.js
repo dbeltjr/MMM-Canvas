@@ -8,13 +8,14 @@ Module.register("MMM-Canvas", {
 
     // Module config defaults.
     defaults: {
-		accessKey: "", //Access key
+    accessKey: "", //Access key
     updateInterval: 60 * 60 * 1000, //One hour
     colors: ["blue",],
     courses: ["28733",],
     urlbase: "dummyurl.edu",
     assignMaxLen: 35,
     assignToDisplay: 12,
+    overdueDays: 7,
     },
 
     getStyles: function() {
@@ -96,35 +97,44 @@ getDom: function() {
 
     // Sort CANVAS data by due date
     CANVAS[1].sort((a, b) => new moment(a[1]) - new moment(b[1]));
+	
+	// Get current date and calculate overdue threshold
+	var now = moment();
+	var overdueThreshold = now.subtract(this.config.overdueDays, "days");
 
-    var assignToDisplay = this.config.assignToDisplay +1;
-    for (var i = 0; i < Math.min(CANVAS[1].length, assignToDisplay); i++) {
-        var row = document.createElement("tr");
-        var classColumn = document.createElement("td");
-        var dueDateColumn = document.createElement("td");
+	// Filter assignments within the overdue period
+	var filteredAssignments = CANVAS[1].filter(assign => {
+		var dueDate = moment(assign[1]);
+		return dueDate.isAfter(overdueThreshold);
+	});
+
+	var assignToDisplay = this.config.assignToDisplay + 1;
+	for (var i = 0; i < Math.min(filteredAssignments.length, assignToDisplay); i++) {
+		var row = document.createElement("tr");
+		var classColumn = document.createElement("td");
+		var dueDateColumn = document.createElement("td");
 
         classColumn.classList.add("align-left", "small");
         dueDateColumn.classList.add("align-left", "small");
 
-        if (CANVAS[1][i][0] != "") {
+		if (filteredAssignments[i][0] != "") {
+			// Display class and color it based on the legend
+			classColumn.innerHTML = filteredAssignments[i][0].slice(0, this.config.assignMaxLen);
+			var courseValueString = String(filteredAssignments[i][2]);
 
-		// Display class and color it based on the legend
-		classColumn.innerHTML = CANVAS[1][i][0].slice(0, this.config.assignMaxLen);
-		var courseValueString = String(CANVAS[1][i][2]);
+			// Use the course value directly as an index for colors
+			var courseIndex = parseInt(courseValueString, 10); // Assuming course values are numeric
+			classColumn.style.color = this.config.colors[courseIndex] || "";
 
-		// Use the course value directly as an index for colors
-		var courseIndex = parseInt(courseValueString, 10); // Assuming course values are numeric
-		classColumn.style.color = this.config.colors[courseIndex] || "";
+			// Display due date
+			var m = moment(filteredAssignments[i][1]);
+			dueDateColumn.innerHTML = m.format("M/D");
+		}
 
-		// Display due date
-		var m = moment(CANVAS[1][i][1]);
-		dueDateColumn.innerHTML = m.format("M/D");
-        }
-
-        row.appendChild(classColumn);
-        row.appendChild(dueDateColumn);
-        table.appendChild(row);
-    }
+    row.appendChild(classColumn);
+    row.appendChild(dueDateColumn);
+    table.appendChild(row);
+	}
 
     wrapper.appendChild(table);
 
