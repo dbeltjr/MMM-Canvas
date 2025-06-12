@@ -5,64 +5,44 @@
  *
  */
 const NodeHelper = require('node_helper');
-const request = require('request');
-var smallpayload = [
-    ["", "", ""],
-];
-var finalpayload = [
-    ["", ""],
-];
+const fetch = require('node-fetch');
+
 module.exports = NodeHelper.create({
+  start: function () {
+    console.log("Starting node_helper for: " + this.name);
+  },
 
-    start: function() {
-        console.log("Starting node_helper for: " + this.name);
-    },
+  getCANVAS: async function (payload) {
+    const key = payload[0];
+    const courses = payload[1];
+    const urlbase = payload[2];
 
-    getCANVAS: function(payload) {
-        var key = payload[0];
-        var courses = payload[1];
-        var urlbase = payload[2];
-        var count = 0;
-        var self = this;
-        courses.forEach(runCourses);
-        var timer = setInterval(function() {
-            if (count == courses.length) {
-                self.sendSocketNotification('CANVAS_RESULT', finalpayload);
-                finalpayload = [
-                    ["", ""],
-                ];
-                smallpayload = [
-                    ["", ""],
-                ];
-                count = 0;
-            }
-        }, 400);
+    const finalpayload = [[], []]; // [placeholder, assignments list]
 
-		function runCourses(item, index) {
-			var url = "https://"+ urlbase +"/api/v1/courses/" + courses[index] + "/assignments?access_token=" + key + "&per_page=30&order_by=due_at&bucket=unsubmitted";
-			request({
-				url: url,
-				method: 'GET'
-			}, (error, response, body) => {
-				if (!error && response.statusCode == 200) {
-					var result = JSON.parse(body);
-					for (var j in result) {
-						smallpayload.push([result[j].name, result[j].due_at, index]);
-					}
-				} else {
-				  console.error("Error fetching assignments:", error);
-				  smallpayload.push(["ERROR", JSON.parse(error), ""]);
-				}
-				finalpayload.push(smallpayload);
-				count++;
-			});
-		}
+    const promises = courses.map(async (courseId, index) => {
+      const url = `https://${urlbase}/api/v1/courses/${courseId}/assignments?access_token=${key}&per_page=30&order_by=due_at&bucket=unsubmitted`;
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const result = await res.json();
 
-    },
+        result.forEach(assign => {
+          finalpayload[1].push([assign.name, assign.due_at, index]);
+        });
+      } catch (err) {
+        console.error("Error fetching assignments for course", courseId, ":", err.message);
+        finalpayload[1].push(["ERROR loading course " + courseId, "", index]);
+      }
+    });
 
-    socketNotificationReceived: function(notification, payload) {
-        if (notification === 'GET_CANVAS') {
-            this.getCANVAS(payload);
-        }
+    await Promise.all(promises);
+
+    this.sendSocketNotification("CANVAS_RESULT", finalpayload);
+  },
+
+  socketNotificationReceived: function (notification, payload) {
+    if (notification === 'GET_CANVAS') {
+      this.getCANVAS(payload);
     }
+  }
 });
