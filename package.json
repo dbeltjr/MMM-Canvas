@@ -1,0 +1,9 @@
+{
+  "name": "MMM-Canvas",
+  "version": "1.0.0",
+  "description": "Canvas assignment display for MagicMirror",
+  "main": "node_helper.js",
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
+}
