@@ -6,6 +6,8 @@ This is a module for `MagicMirror²` which displays upcoming assignments from th
 ```
 cd /MagicMirror/modules
 git clone https://github.com/dbeltjr/MMM-Canvas.git
+cd MMM-Canvas
+npm install
 ```
 2.  Edit your configuration file under `config/config.js` with the following configuration.
 ```
