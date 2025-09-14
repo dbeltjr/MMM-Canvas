@@ -23,6 +23,9 @@ npm install
     assignMaxLen: 35,
     assignToDisplay: 3,
     overdueDays: 7,
+	hideAssignments: [
+		"Alternate Assignment",
+		],
   }
 },
 ```
@@ -32,7 +35,8 @@ npm install
 6. (Optional) To color code the courses, put in colors in the colors array in the corresponding order with the courses array. This array accepts all CSS color values [CSS Colors](https://www.w3schools.com/colors/default.asp). I reccomend using the color names for clarity.
 7. (Optional) To designate the course short title in the legend, Enter it in the same order as the "courses:" config line
 8. (Optional) assignMaxLen will keep assignments from displaying too long, and assignToDisplay changes the number of upcoming assignments to show.
-9. Legend above the list is centered, but the CSS may need to be adjusted with either a margin-right or margin-left depending on where the module is placed.
+9. (Optional) If there are any assignments that you don't want displayed, copy the exact title of the assignment and paste it with quotation marks under the section hideAssignments.
+10. Legend above the list is centered, but the CSS may need to be adjusted with either a margin-right or margin-left depending on where the module is placed.
 ```
 .legend-item {
     margin-right: 10px;

@@ -16,6 +16,7 @@ Module.register("MMM-Canvas", {
     assignMaxLen: 35,
     assignToDisplay: 12,
     overdueDays: 7,
+	hideAssignments: [],
     },
 
     getStyles: function() {
@@ -102,10 +103,14 @@ getDom: function() {
 	var now = moment();
 	var overdueThreshold = now.subtract(this.config.overdueDays, "days");
 
-	// Filter assignments within the overdue period
+	// Filter assignments within the overdue period and hide list from config
 	var filteredAssignments = CANVAS[1].filter(assign => {
 		var dueDate = moment(assign[1]);
-		return dueDate.isAfter(overdueThreshold);
+		var assignmentName = assign[0];
+		return (
+			dueDate.isAfter(overdueThreshold)&&
+			!this.config.hideAssignments.includes(assignmentName)
+		);
 	});
 
 	var assignToDisplay = this.config.assignToDisplay + 1;
