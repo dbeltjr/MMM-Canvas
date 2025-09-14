@@ -43,7 +43,7 @@ npm install
     margin-left: 10px;
 }
 ```
-10. (Optional) By default assignments beyond 7 days overdue will drop off the list. This can be changed to any number of days.
+11. (Optional) By default assignments beyond 7 days overdue will drop off the list. This can be changed to any number of days.
 ### Preview
 ![Screenshot](screenshot.png)
 
